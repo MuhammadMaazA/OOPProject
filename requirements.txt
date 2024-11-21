@@ -1,0 +1,15 @@
+pybullet >= 3.0.6
+dqrobotics >= 23.4.0a18
+numpy >= 1.19.3
+matplotlib >= 3.3.2
+pynput >= 1.7.1
+termcolor >= 1.1.0
+plotly >= 4.12.0
+scikit-image >= 0.17.2
+pytest >= 6.1.2
+pyyaml >=5.3.1
+pandas >=1.1.4
+pyglm==0.4.8b1
+ipython
+setuptools
+
