@@ -28,7 +28,7 @@ def create_custom_object(size=[0.05, 0.05, 0.8]):
     )
     
     return object_id
-
+# hassan stop touching me
 def generate_pose(object_position, object_size, height, orientation_type, offset=0):
     """Generate pose for the gripper based on specified parameters."""
     obj_width, obj_depth, obj_height = object_size
