@@ -4,6 +4,7 @@ import pybullet_data
 import math
 import csv
 import os
+import random
 from gripper import Gripper
 from evaluate import evaluate_grasp
 
@@ -31,15 +32,26 @@ def create_custom_object(size=[0.05, 0.05, 0.8]):
     
     return object_id
 
-def generate_pose(object_position, object_size, height, orientation_type, step, total_steps):
+def generate_pose(object_position, object_size, height, orientation_type, step, total_steps, radius):
+    """Generate a gripper pose with improved variability."""
     obj_width, obj_depth, obj_height = object_size
     midplane_line = [object_position[0], object_position[1], object_position[2] + height]
-    radius = 0.25
+
+    # Introduce randomness in the radius to explore different distances from the object
+    radius_variability = random.uniform(-0.03, 0.03)  # Radius variation within ±0.03
+    radius += radius_variability
+
+    # Compute the angle for the current step
     angle = (2 * math.pi) * (step / total_steps)
+
+    # Introduce variability in gripper positions along X, Y, and Z
     gripper_x = midplane_line[0] + radius * math.cos(angle)
-    gripper_y = midplane_line[1] + radius * math.sin(angle)
-    gripper_z = midplane_line[2]
+    gripper_y = midplane_line[1] + radius * math.sin(angle) + random.uniform(-0.05, 0.05)  # Vary Y by ±0.05
+    gripper_z = midplane_line[2] + random.uniform(-0.2, 0.2)  # Vary Z by ±0.2
+
     gripper_position = [gripper_x, gripper_y, gripper_z]
+
+    # Compute direction vector from gripper to the midplane (pointing toward the cuboid)
     direction_vector = [
         midplane_line[0] - gripper_position[0],
         midplane_line[1] - gripper_position[1],
@@ -47,10 +59,13 @@ def generate_pose(object_position, object_size, height, orientation_type, step, 
     ]
     magnitude = math.sqrt(sum([i ** 2 for i in direction_vector]))
     direction_vector = [i / magnitude for i in direction_vector]
-    yaw = math.atan2(direction_vector[1], direction_vector[0])
-    pitch = math.asin(-direction_vector[2])
-    roll = 0
 
+    # Introduce randomness in orientation angles for roll, pitch, and yaw
+    roll = random.uniform(-0.5, 0.5)  # Roll variation between -0.5 and 0.5 radians (~ -28.65 to 28.65 degrees)
+    pitch = random.uniform(-0.5, 0.5)  # Pitch variation between -0.5 and 0.5 radians
+    yaw = math.atan2(direction_vector[1], direction_vector[0]) + random.uniform(-0.5, 0.5)  # Yaw with added randomness
+
+    # Set orientation based on the specified type
     if orientation_type == "horizontal":
         orientation = p.getQuaternionFromEuler([roll, pitch, yaw])
     elif orientation_type == "vertical":
@@ -72,8 +87,10 @@ def main():
     object_position = [0, 0, object_size[2] / 2]
     object_id = create_custom_object(object_size)
     
+    # Initialize gripper in an open state
     gripper = Gripper([0, 0, object_size[2] + 0.2], p.getQuaternionFromEuler([0, 0, 0]))
-    total_steps = 20
+    gripper.open_gripper()  # Make sure the gripper is open by default
+    total_steps = 50  # Increase number of steps to generate more data points
 
     # Check if CSV file exists
     file_exists = os.path.isfile('grasp_data.csv')
@@ -90,21 +107,29 @@ def main():
                 "Initial Z", "Final Z", "Delta Z", "Success"
             ])
 
-        # Horizontal orientation tests
+        # Horizontal orientation tests with increased total_steps
         for step in range(total_steps):
+            # Reset the object position
             p.resetBasePositionAndOrientation(object_id, object_position, [0, 0, 0, 1])
-            position, orientation = generate_pose(object_position, object_size, 0, "horizontal", step, total_steps)
+            
+            # Generate pose for the gripper
+            position, orientation = generate_pose(object_position, object_size, 0, "horizontal", step, total_steps, 0.25)
             orientation_euler = p.getEulerFromQuaternion(orientation)
             initial_position, _ = p.getBasePositionAndOrientation(object_id)
 
-            gripper.open_gripper()
+            # Set the gripper to the desired position and orientation
             gripper.set_position(position, orientation)
             time.sleep(1)
+
+            # Close the gripper after positioning
             gripper.close_gripper()
             time.sleep(0.5)
+
+            # Move the gripper up to evaluate the grasp
             gripper.move_up_smoothly(target_z=position[2] + 0.3)
             time.sleep(0.5)
 
+            # Evaluate grasp success
             success, delta_z, final_position = evaluate_grasp(object_id, initial_position)
 
             # Write the data to the CSV file
@@ -114,8 +139,10 @@ def main():
                 initial_position[2], final_position[2], delta_z, success
             ])
 
+            # Reset for the next iteration
             p.removeBody(object_id)
             object_id = create_custom_object(object_size)
+            gripper.open_gripper()  # Ensure the gripper is open for the next iteration
             time.sleep(1)
 
     # Disconnect simulation
