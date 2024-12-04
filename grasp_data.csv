@@ -1,4 +1,4 @@
-Step,Position X,Position Y,Position Z,Orientation Roll,Orientation Pitch,Orientation Yaw,Initial Z,Final Z,Delta Z,Success
+Radius,Step,Position X,Position Y,Position Z,Orientation Roll,Orientation Pitch,Orientation Yaw,Initial Z,Final Z,Delta Z,Success
 0.25,1,0.3,0.0,0.4,0.0,-0.0,3.141592653589793,0.4,0.525409411741017,0.1254094117410169,True
 0.25,2,0.285316954888546,0.0927050983124842,0.4,0.0,-0.0,-2.827433388230814,0.4,0.5277390750980796,0.1277390750980795,True
 0.25,1,0.3,0.0,0.4,0.0,-0.0,3.141592653589793,0.4,0.525409411741017,0.1254094117410169,True
