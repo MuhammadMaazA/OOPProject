@@ -17,6 +17,12 @@ def evaluate_grasp(object_id, initial_position):
     delta_z = final_z - initial_z
 
     # Determine success if delta_z exceeds the threshold
-    success = delta_z > 0.1
+    # Determine outcome
+    if delta_z > 0.1:
+        success = 1  # Success
+    elif 0.05 <= delta_z <= 0.1:
+        success = 2  # Almost
+    else:
+        success = 0  # Failure
 
     return success, delta_z,final_position
