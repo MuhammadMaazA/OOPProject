@@ -1,14 +1,19 @@
 import pandas as pd
 
-
-csv_file = 'cleaned_grasp_data.csv'
+# Load the data
+csv_file = 'grasp_data_cylinder.csv'
 data = pd.read_csv(csv_file)
 
+# Remove the 'Step' column
+if 'Step' in data.columns:
+    data = data.drop(columns=['Step'])
 
-data['Success'] = data['Delta Z'].apply(lambda x: 1 if x > 0.1 else (2 if 0.05 <= x <= 0.1 else 0))
+# Add the 'Radius' column with a value of 0.22
+data.insert(0, 'Radius', 0.22)  # Adding at the start of the dataframe
 
-
-updated_csv_file = 'updated_grasp_data.csv'
+# Save the updated data to a new file
+updated_csv_file = 'grasp_data_cylinder.csv'
 data.to_csv(updated_csv_file, index=False)
 
-print(f"Updated data saved to {updated_csv_file}")
+print(
+    f"Updated data without 'Step' and with 'Radius' column saved to {updated_csv_file}")

@@ -1,6 +1,7 @@
 import pybullet as p
 import time
 
+
 def evaluate_grasp(object_id, initial_position):
     """
     Evaluate if the grasp was successful based on the change in the object's z-position.
@@ -25,4 +26,4 @@ def evaluate_grasp(object_id, initial_position):
     else:
         success = 0  # Failure
 
-    return success, delta_z,final_position
+    return success, delta_z, final_position

@@ -5,8 +5,8 @@ from sklearn.metrics import accuracy_score, roc_curve, auc
 import joblib
 import matplotlib.pyplot as plt
 
-# Load the dataset for cuboid grasp data
-data = pd.read_csv('updated_grasp_data.csv')
+# Load the dataset for cylinder grasp data
+data = pd.read_csv('grasp_data_cylinder.csv')
 
 # Define features excluding 'Radius'
 X = data[['Position X', 'Position Y', 'Position Z',
@@ -32,13 +32,13 @@ accuracy = accuracy_score(y_test, y_pred_test)
 print(f"Final test accuracy: {accuracy * 100:.2f}%")
 
 # Save the trained model
-joblib.dump(model, 'cuboid_grasp_model.pkl')
+joblib.dump(model, 'cylinder_grasp_model.pkl')
 
 # Predict on the entire dataset to add predictions
 data['Predicted Success'] = model.predict(X)
 
 # Save the updated dataset with predictions
-data.to_csv('updated_grasp_data_with_predictions.csv', index=False)
+data.to_csv('updated_grasp_data_cylinder_with_predictions.csv', index=False)
 
 # Generate ROC curve
 y_proba = model.predict_proba(X_test)[:, 1]
@@ -46,11 +46,12 @@ fpr, tpr, _ = roc_curve(y_test, y_proba, pos_label=1)
 roc_auc = auc(fpr, tpr)
 
 plt.figure()
-plt.plot(fpr, tpr, label=f'ROC curve (area = {roc_auc:.2f})', color='darkorange', lw=2)
+plt.plot(
+    fpr, tpr, label=f'ROC curve (area = {roc_auc:.2f})', color='darkorange', lw=2)
 plt.plot([0, 1], [0, 1], color='navy', linestyle='--', lw=2)
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
-plt.title('ROC Curve (Cuboid)')
+plt.title('ROC Curve (Cylinder)')
 plt.legend(loc="lower right")
 plt.tight_layout()
 plt.show()
@@ -62,6 +63,6 @@ plt.bar(X.columns, feature_importances, color='skyblue')
 plt.xticks(rotation=45, ha='right')  # Rotate feature names to avoid overlap
 plt.xlabel('Features')
 plt.ylabel('Importance')
-plt.title('Feature Importance (Cuboid)')
+plt.title('Feature Importance (Cylinder)')
 plt.tight_layout()
 plt.show()

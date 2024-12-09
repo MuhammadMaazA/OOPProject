@@ -4,7 +4,7 @@ import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
 # Load data
-data = pd.read_csv("updated_grasp_data.csv")
+data = pd.read_csv("updated_grasp_data_cylinder_with_predictions.csv")
 
 # Define color mapping
 colors = {
@@ -13,16 +13,14 @@ colors = {
     2: 'blue'    # Almost
 }
 
-# Common variables for plotting the cuboid boundary
-boundary_x = [-0.1, -0.1, 0.1, 0.1, -0.1, -0.1, 0.1, 0.1]
-boundary_y = [-0.1, 0.1, 0.1, -0.1, -0.1, 0.1, 0.1, -0.1]
-boundary_z = [0, 0, 0, 0, 0.8, 0.8, 0.8, 0.8]
-
-edges = [
-    [0, 1], [1, 2], [2, 3], [3, 0],  # Bottom square
-    [4, 5], [5, 6], [6, 7], [7, 4],  # Top square
-    [0, 4], [1, 5], [2, 6], [3, 7]   # Vertical edges
-]
+# Parameters for plotting the cylinder boundary
+cylinder_radius = 0.06
+cylinder_height = 0.8
+theta = np.linspace(0, 2 * np.pi, 100)
+z = np.linspace(0, cylinder_height, 100)
+theta_grid, z_grid = np.meshgrid(theta, z)
+x_cylinder = cylinder_radius * np.cos(theta_grid)
+y_cylinder = cylinder_radius * np.sin(theta_grid)
 
 # Plot Gripper Position
 
@@ -45,11 +43,8 @@ def plot_gripper_position(data):
     ax.set_zlabel('Gripper Z')
     ax.set_title('Gripper Visualization - Position Only')
 
-    # Adding the URDF cuboid boundary
-    for edge in edges:
-        ax.plot([boundary_x[edge[0]], boundary_x[edge[1]]],
-                [boundary_y[edge[0]], boundary_y[edge[1]]],
-                [boundary_z[edge[0]], boundary_z[edge[1]]], color='black', alpha=0.8)
+    # Adding the URDF cylinder boundary with darker color and higher opacity
+    ax.plot_surface(x_cylinder, y_cylinder, z_grid, color='black', alpha=0.4)
 
     plt.show()
 
@@ -76,11 +71,8 @@ def plot_gripper_position_orientation(data):
     ax.set_zlabel('Gripper Z')
     ax.set_title('Gripper Visualization - Position and Orientation')
 
-    # Adding the URDF cuboid boundary
-    for edge in edges:
-        ax.plot([boundary_x[edge[0]], boundary_x[edge[1]]],
-                [boundary_y[edge[0]], boundary_y[edge[1]]],
-                [boundary_z[edge[0]], boundary_z[edge[1]]], color='black', alpha=0.8)
+    # Adding the URDF cylinder boundary with darker color and higher opacity
+    ax.plot_surface(x_cylinder, y_cylinder, z_grid, color='black', alpha=0.4)
 
     plt.show()
 
@@ -105,11 +97,8 @@ def plot_gripper_outcome(data):
     ax.set_zlabel('Gripper Z')
     ax.set_title('Gripper Visualization - Grasping Outcome')
 
-    # Adding the URDF cuboid boundary
-    for edge in edges:
-        ax.plot([boundary_x[edge[0]], boundary_x[edge[1]]],
-                [boundary_y[edge[0]], boundary_y[edge[1]]],
-                [boundary_z[edge[0]], boundary_z[edge[1]]], color='black', alpha=0.8)
+    # Adding the URDF cylinder boundary with darker color and higher opacity
+    ax.plot_surface(x_cylinder, y_cylinder, z_grid, color='black', alpha=0.4)
 
     plt.show()
 

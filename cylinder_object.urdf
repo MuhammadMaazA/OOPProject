@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<robot name="tall_cylinder_object">
+  <link name="tall_cylinder_link">
+    <visual>
+      <!-- Cylinder: length=0.8m, radius=0.05m -->
+      <!-- center at 0.4m so top at 0.8m -->
+      <origin xyz="0 0 0.4" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.8" radius="0.05"/>
+      </geometry>
+      <material name="Gray">
+        <color rgba="0.7 0.7 0.7 1"/>
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0.4" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.8" radius="0.05"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <!-- Increase mass and inertia for stability -->
+      <mass value="5.0"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+    </inertial>
+  </link>
+</robot>

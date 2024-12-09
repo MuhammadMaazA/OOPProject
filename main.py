@@ -20,6 +20,7 @@ if os.path.exists(MODEL_FILENAME):
 else:
     model = RandomForestClassifier()
 
+
 def create_custom_object(size=[0.05, 0.05, 0.8]):
     """Create a custom box-shaped object."""
     visual_shape_id = p.createVisualShape(
@@ -27,12 +28,12 @@ def create_custom_object(size=[0.05, 0.05, 0.8]):
         halfExtents=[s / 2 for s in size],
         rgbaColor=[1, 1, 1, 1]
     )
-    
+
     collision_shape_id = p.createCollisionShape(
         shapeType=p.GEOM_BOX,
         halfExtents=[s / 2 for s in size]
     )
-    
+
     object_id = p.createMultiBody(
         baseMass=0.1,
         baseInertialFramePosition=[0, 0, 0],
@@ -41,8 +42,10 @@ def create_custom_object(size=[0.05, 0.05, 0.8]):
         basePosition=[0, 0, size[2] / 2],
         useMaximalCoordinates=False
     )
-    
+
     return object_id
+
+
 """
 def generate_pose(object_position, object_size, height, orientation_type, step, total_steps):
 
@@ -111,23 +114,28 @@ def write_to_csv(filename, data, headers):
             writer.writeheader()
         writer.writerow(data)
 """
+
+
 def train_model(filename):
     """
     Train a machine learning model to predict grasp success.
     """
     data = pd.read_csv(filename)
-    X = data[['Gripper X', 'Gripper Y', 'Gripper Z', 'Gripper Roll', 'Gripper Pitch', 'Gripper Yaw']]
+    X = data[['Gripper X', 'Gripper Y', 'Gripper Z',
+              'Gripper Roll', 'Gripper Pitch', 'Gripper Yaw']]
     y = data['Success']
     y = y.astype(int)  # Ensure the success labels are integers
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42)
+
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
     print(f"Model training completed. Accuracy: {accuracy * 100:.2f}%")
-    
+
     # Save the trained model
     joblib.dump(model, MODEL_FILENAME)
+
 
 def predict_success(position, orientation_euler):
     """
@@ -146,9 +154,11 @@ def predict_success(position, orientation_euler):
     else:
         return False
 
+
 def main():
     # Connect to PyBullet
-    p.connect(p.DIRECT)  # Use DIRECT to reduce resource usage for overnight training
+    # Use DIRECT to reduce resource usage for overnight training
+    p.connect(p.DIRECT)
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
     p.resetSimulation()
     p.setGravity(0, 0, -9.81)
@@ -200,7 +210,8 @@ def main():
                 orientation_euler = p.getEulerFromQuaternion(orientation)
 
                 # Predict success using the current model
-                predicted_success = predict_success(position, orientation_euler)
+                predicted_success = predict_success(
+                    position, orientation_euler)
 
                 # Log the 6DOF
                 print(f"Orientation: {orientation_type}, "
@@ -209,7 +220,8 @@ def main():
                       f"Predicted Success: {predicted_success}")
 
                 # Record the initial position of the object
-                initial_position, _ = p.getBasePositionAndOrientation(object_id)
+                initial_position, _ = p.getBasePositionAndOrientation(
+                    object_id)
 
                 # Perform actions with the gripper
                 gripper.open_gripper()
@@ -224,7 +236,8 @@ def main():
                 success, delta_z, final_position = evaluate_grasp(
                     object_id, initial_position
                 )
-                print(f"Success: {success}, Δz: {delta_z:.3f}, Final Position: {final_position}")
+                print(
+                    f"Success: {success}, Δz: {delta_z:.3f}, Final Position: {final_position}")
 
                 # Collect data and write to CSV
                 data = {
@@ -248,6 +261,7 @@ def main():
 
     # Disconnect simulation
     p.disconnect()
+
 
 if __name__ == "__main__":
     main()

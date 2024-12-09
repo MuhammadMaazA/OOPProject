@@ -15,7 +15,8 @@ class Gripper:
         # Make the gripper lightweight by setting its mass to 0
         p.changeDynamics(self.gripper, -1, mass=0)
         # Retrieve and store active and fixed joint information
-        self.active_joints, self.fixed_joints = self.get_joint_info(self.gripper)
+        self.active_joints, self.fixed_joints = self.get_joint_info(
+            self.gripper)
 
     # Get the joint info: active joints for movement, fixed joints for structure
     def get_joint_info(self, gripper):
@@ -38,7 +39,8 @@ class Gripper:
 
     # Open the gripper to its maximum position
     def open_gripper(self):
-        open_positions = [0.548, 0.548]  # Define target positions for each joint
+        # Define target positions for each joint
+        open_positions = [0.548, 0.548]
         for target_position, joint_index in zip(open_positions, self.active_joints):
             # Set motor control to position mode for each joint
             p.setJointMotorControl2(

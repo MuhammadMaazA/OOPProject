@@ -5,8 +5,8 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, roc_curve,
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import label_binarize
 
-# Load the data
-data = pd.read_csv('updated_grasp_data_with_predictions.csv')
+# Load the cylinder grasp data
+data = pd.read_csv('updated_grasp_data_cylinder_with_predictions.csv')
 
 # Relevant columns for success and pose
 position_columns = ['Position X', 'Position Y', 'Position Z']
@@ -25,7 +25,7 @@ def plot_success_rate_vs_data(data):
     plt.plot(num_points, success_rate, color='blue', label='Success Rate')
     plt.xlabel('Number of Data Points')
     plt.ylabel('Success Rate')
-    plt.title('Success Rate vs. Number of Data Points')
+    plt.title('Success Rate vs. Number of Data Points (Cylinder)')
     plt.legend()
     plt.grid()
     plt.tight_layout()
@@ -42,7 +42,7 @@ def plot_confusion_matrix(data):
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[
                                   'Failure', 'Almost', 'Success'])
     disp.plot(cmap=plt.cm.Blues)
-    plt.title('Confusion Matrix for Grasp Classifier')
+    plt.title('Confusion Matrix for Cylinder Grasp Classifier')
     plt.tight_layout()
     plt.show()
 
@@ -60,7 +60,7 @@ def plot_successful_grasps(data):
     ax.set_xlabel('Position X')
     ax.set_ylabel('Position Y')
     ax.set_zlabel('Position Z')
-    ax.set_title('Pose Variability in Successful Grasps')
+    ax.set_title('Pose Variability in Successful Grasps (Cylinder)')
     plt.legend()
     plt.tight_layout()
     plt.show()
@@ -77,7 +77,7 @@ def plot_sensitivity_analysis(data):
     success_rate_per_bin.plot(kind='bar', color='purple', alpha=0.7)
     plt.xlabel('Orientation Roll (Binned)')
     plt.ylabel('Average Success Rate')
-    plt.title('Sensitivity Analysis of Grasp Success to Roll Angle')
+    plt.title('Sensitivity Analysis of Grasp Success to Roll Angle (Cylinder)')
     plt.grid(axis='y')
     plt.tight_layout()
     plt.show()
@@ -96,7 +96,7 @@ def plot_feature_importance(data):
 
     plt.figure(figsize=(10, 6))
     plt.barh(features, importance, color='skyblue')
-    plt.title('Feature Importance')
+    plt.title('Feature Importance (Cylinder)')
     plt.xlabel('Importance Score')
     plt.ylabel('Features')
     plt.tight_layout()
@@ -125,7 +125,7 @@ def plot_roc_curve(data):
         plt.plot(fpr[i], tpr[i],
                  label=f'Class {i} (AUC = {roc_auc[i]:.2f})', color=color)
     plt.plot([0, 1], [0, 1], 'k--')
-    plt.title('ROC Curve')
+    plt.title('ROC Curve (Cylinder)')
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.legend()
