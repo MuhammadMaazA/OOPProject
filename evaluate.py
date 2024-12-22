@@ -1,29 +1,76 @@
 import pybullet as p
 import time
+import os
+import csv
 
 
-def evaluate_grasp(object_id, initial_position):
-    """
-    Evaluate if the grasp was successful based on the change in the object's z-position.
-    Also, return the change in z-position (delta_z) and the final position of the object.
-    """
-    time.sleep(0.5)
-    final_position, _ = p.getBasePositionAndOrientation(object_id)
+class GripperEvaluator:
+    def __init__(self, csv_filename="gripper_data_old_format.csv"):
+        """
+        Initialize the GripperEvaluator for the 'old format' columns:
+        Position X, Position Y, Position Z,
+        Orientation Roll, Orientation Pitch, Orientation Yaw,
+        Initial Z, Final Z, Delta Z, Success
+        """
+        self.csv_filename = csv_filename
+        self.headers = [
+            "Position X", "Position Y", "Position Z",
+            "Orientation Roll", "Orientation Pitch", "Orientation Yaw",
+            "Initial Z", "Final Z", "Delta Z",
+            "Success"
+        ]
 
-    # Extract z-components of the initial and final positions
-    initial_z = initial_position[2]
-    final_z = final_position[2]
+        # Create file with headers if doesn't exist
+        if not os.path.isfile(self.csv_filename):
+            with open(self.csv_filename, mode="w", newline="") as file:
+                writer = csv.writer(file)
+                writer.writerow(self.headers)
 
-    # Calculate the change in z (delta_z)
-    delta_z = final_z - initial_z
+    def evaluate_grasp(self, object_id, initial_position):
+        """
+        Evaluate grasp with any threshold logic you want.
+        For example:
+          - If delta_z > 0.1 => success = 1
+          - If 0.05 <= delta_z <= 0.1 => success = 2 (almost)
+          - else => 0 (failure)
+        Adjust as you wish or revert to old logic exactly.
+        """
+        time.sleep(0.5)
+        if not p.isConnected():
+            return 0, 0.0, initial_position
 
-    # Determine success if delta_z exceeds the threshold
-    # Determine outcome
-    if delta_z > 0.1:
-        success = 1  # Success
-    elif 0.05 <= delta_z <= 0.1:
-        success = 2  # Almost
-    else:
-        success = 0  # Failure
+        final_position, _ = p.getBasePositionAndOrientation(object_id)
 
-    return success, delta_z, final_position
+        initial_z = initial_position[2]
+        final_z = final_position[2]
+        delta_z = final_z - initial_z
+
+        if delta_z > 0.1:
+            success = 1
+        elif 0.05 <= delta_z <= 0.1:
+            success = 2
+        else:
+            success = 0
+
+        return success, delta_z, final_position
+
+    def save_to_csv(self, data):
+        """
+        Append a single row to CSV if unique.
+        data = [Position X, Position Y, Position Z, Roll, Pitch, Yaw, Initial Z, Final Z, Delta Z, Success]
+        """
+        existing_data = set()
+        if os.path.isfile(self.csv_filename):
+            with open(self.csv_filename, mode="r") as file:
+                reader = csv.reader(file)
+                next(reader, None)  # Skip header
+                for row in reader:
+                    existing_data.add(tuple(row))
+
+        data_tuple = tuple(map(str, data))
+        if data_tuple not in existing_data:
+            with open(self.csv_filename, mode="a", newline="") as file:
+                writer = csv.writer(file)
+                writer.writerow(data)
+        else:
+            print("Duplicate data row detected. Skipping.")

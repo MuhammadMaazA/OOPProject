@@ -1,1 +1,0 @@
-Objects/BleachCleanserHD/bleach_cleanser.obj, True, True, True, True, False, False, False, False, False, 3, False, True
