@@ -73,4 +73,3 @@ visualize.py: 3D visualization of gripper poses and orientations, overlaying cub
 For example, to run the KDE plots:
 python plots/KDE.py
 This loads updated_grasp_data_cuboid_with_predictions.csv from the data/ folder and displays KDE heatmaps in a window.
-
