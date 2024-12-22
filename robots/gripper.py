@@ -130,9 +130,6 @@ class CustomGripper(BaseGripper):
 
 
 def select_gripper(gripper_type, position, orientation):
-    """
-    Factory function to create and return a gripper instance based on user input.
-    """
     if gripper_type == "pr2":
         return PR2Gripper(position, orientation)
     elif gripper_type == "custom":

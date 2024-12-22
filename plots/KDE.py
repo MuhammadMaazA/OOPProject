@@ -9,7 +9,6 @@ cuboid_csv = os.path.join(
 cylinder_csv = os.path.join(
     data_folder, "updated_grasp_data_cylinder_with_predictions.csv")
 
-# Load the cuboid and cylinder data
 cuboid_data = pd.read_csv(cuboid_csv)
 cylinder_data = pd.read_csv(cylinder_csv)
 
@@ -30,10 +29,9 @@ def generate_kde_heatmap(data, x_col, y_col, title):
     plt.xlabel(x_col, fontsize=12)
     plt.ylabel(y_col, fontsize=12)
     plt.tight_layout()
-    plt.show()  # or plt.close() if you don't want to show interactively
+    plt.show()
 
 
-# Generate KDE plots for cuboid
 generate_kde_heatmap(
     cuboid_data,
     'Position X', 'Position Y',
@@ -45,7 +43,6 @@ generate_kde_heatmap(
     'KDE Heatmap of Grasp Positions (X-Z) - Cuboid'
 )
 
-# Generate KDE plots for cylinder
 generate_kde_heatmap(
     cylinder_data,
     'Position X', 'Position Y',

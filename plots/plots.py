@@ -6,11 +6,9 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, roc_curve,
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import label_binarize
 
-# Load the data
 data = pd.read_csv(os.path.join(
     "data", "updated_grasp_data_cuboid_with_predictions.csv"))
 
-# Relevant columns for success and pose
 position_columns = ['Position X', 'Position Y', 'Position Z']
 orientation_columns = ['Orientation Roll',
                        'Orientation Pitch', 'Orientation Yaw']
@@ -120,7 +118,6 @@ def plot_roc_curve(data):
     plt.show()
 
 
-# Run the plots
 plot_confusion_matrix(data)
 plot_successful_grasps(data)
 plot_sensitivity_analysis(data)

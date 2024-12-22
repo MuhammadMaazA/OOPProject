@@ -3,7 +3,6 @@ import time
 import os
 import csv
 
-
 class GripperEvaluator:
     def __init__(self, csv_filename="gripper_data_old_format.csv"):
         """
@@ -20,7 +19,6 @@ class GripperEvaluator:
             "Success"
         ]
 
-        # Create file with headers if doesn't exist
         if not os.path.isfile(self.csv_filename):
             with open(self.csv_filename, mode="w", newline="") as file:
                 writer = csv.writer(file)
@@ -28,12 +26,11 @@ class GripperEvaluator:
 
     def evaluate_grasp(self, object_id, initial_position):
         """
-        Evaluate grasp with any threshold logic you want.
-        For example:
-          - If delta_z > 0.1 => success = 1
-          - If 0.05 <= delta_z <= 0.1 => success = 2 (almost)
-          - else => 0 (failure)
-        Adjust as you wish or revert to old logic exactly.
+        Evaluate the success of a grasp based on delta_z logic.
+        Returns (success_code, delta_z, final_position).
+          success_code = 1 if delta_z > 0.1
+                         2 if 0.05 <= delta_z <= 0.1
+                         0 otherwise
         """
         time.sleep(0.5)
         if not p.isConnected():
@@ -46,18 +43,21 @@ class GripperEvaluator:
         delta_z = final_z - initial_z
 
         if delta_z > 0.1:
-            success = 1
+            success = 1   # Fully successful
         elif 0.05 <= delta_z <= 0.1:
-            success = 2
+            success = 2   # Almost
         else:
-            success = 0
+            success = 0   # Failure
 
         return success, delta_z, final_position
 
     def save_to_csv(self, data):
         """
         Append a single row to CSV if unique.
-        data = [Position X, Position Y, Position Z, Roll, Pitch, Yaw, Initial Z, Final Z, Delta Z, Success]
+        data should be in the format:
+        [Position X, Position Y, Position Z,
+         Orientation Roll, Orientation Pitch, Orientation Yaw,
+         Initial Z, Final Z, Delta Z, Success]
         """
         existing_data = set()
         if os.path.isfile(self.csv_filename):

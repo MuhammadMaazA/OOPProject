@@ -4,9 +4,6 @@ train_model.py
 Trains a Random Forest model on either cuboid or cylinder data in 'data' folder,
 saves the model to 'models/{shape}_grasp_model.pkl', and updates CSV with predictions.
 
-Columns (old format) expected in CSV:
-Position X,Position Y,Position Z,Orientation Roll,Orientation Pitch,Orientation Yaw,
-Initial Z,Final Z,Delta Z,Success
 """
 
 import os
@@ -47,7 +44,6 @@ def train_model(shape):
         print("[ERROR] 'Success' column not found in CSV. Aborting.")
         return
 
-    # old format columns as features
     features = [
         "Position X", "Position Y", "Position Z",
         "Orientation Roll", "Orientation Pitch", "Orientation Yaw"
@@ -60,7 +56,6 @@ def train_model(shape):
     X = data[features]
     y = data["Success"].astype(int)
 
-    # Train/test split
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
@@ -72,23 +67,19 @@ def train_model(shape):
     print(
         f"[INFO] Mean cross-validation accuracy: {cv_scores.mean() * 100:.2f}%")
 
-    # Fit final model
     model.fit(X_train, y_train)
     y_pred_test = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred_test)
     print(f"[INFO] Final test accuracy ({shape}): {accuracy * 100:.2f}%")
 
-    # Save model in 'models' folder
     models_folder = "models"
     os.makedirs(models_folder, exist_ok=True)
     model_file = os.path.join(models_folder, f"{shape}_grasp_model.pkl")
     joblib.dump(model, model_file)
     print(f"[INFO] Saved model to {model_file}")
 
-    # Append predicted successes to entire dataset
     data['Predicted Success'] = model.predict(X)
 
-    # Write updated CSV
     updated_csv = os.path.join(
         data_folder, f"updated_grasp_data_{shape}_with_predictions.csv")
     data.to_csv(updated_csv, index=False)
